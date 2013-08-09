@@ -7,33 +7,90 @@ using System.Collections.Specialized;
 
 namespace ObjectiveCommons.Collections
 {
-    public class RangeObservableCollection<T> : ObservableCollection<T>
+    /// <summary>
+    /// ObservableCollection с возможностью временного подавления уведомлений об изменении элементов
+    /// </summary>
+    /// <typeparam name="T">Тип элемента коллекции</typeparam>
+    public class LockableObservableCollection<T> : ObservableCollection<T>
     {
-        internal bool SupressNotifications = false;
+        /// <summary>
+        /// Подавляет уведомления об изменении коллекции
+        /// </summary>
+        private bool NotificationsSupressed = false;
+
+        private bool NotificationsAwaiting = false;
 
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            if (!SupressNotifications)
+            if (!NotificationsSupressed)
                 base.OnCollectionChanged(e);
+            else
+                NotificationsAwaiting = true;
         }
 
-        public void AddRange(IEnumerable<T> list)
+        /// <summary>
+        /// Добавляет последовательность элементов в коллекцию, вызывая только одно событие CollectionChanged
+        /// </summary>
+        /// <param name="elements">Элементы для добавления</param>
+        public void AddRange(IEnumerable<T> elements)
         {
-            if (list == null)
-                throw new ArgumentNullException("list");
+            if (elements == null)
+                throw new ArgumentNullException("elements");
 
-            SupressNotifications = true;
-
-            foreach (T item in list)
+            using (Locker())
             {
-                Add(item);
+                foreach (T item in elements)
+                {
+                    Add(item);
+                }
             }
-            SupressNotifications = false;
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
-    }
 
-    public class CollectionRefreshLocker
-    {
+        /// <summary>
+        /// Заставляет коллекцию подавить нотификации
+        /// </summary>
+        protected void SupressNotifications()
+        {
+            NotificationsSupressed = true;
+        }
+        /// <summary>
+        /// Разрешает коллекции излучать нотификации
+        /// </summary>
+        protected void ReleaseNotifications()
+        {
+            NotificationsSupressed = false;
+            
+            if (NotificationsAwaiting)
+                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+
+            NotificationsAwaiting = false;
+        }
+
+        /// <summary>
+        /// Объект подавления нотификаций в коллекции.
+        /// </summary>
+        public class NotificationLocker : IDisposable
+        {
+            public LockableObservableCollection<T> OnCollection { get; private set; }
+
+            public NotificationLocker(LockableObservableCollection<T> OnCollection)
+            {
+                this.OnCollection = OnCollection;
+                OnCollection.SupressNotifications();
+            }
+
+            public void Dispose()
+            {
+                OnCollection.ReleaseNotifications();
+            }
+        }
+        /// <summary>
+        /// Заставляет коллекцию временно подавить нотификации об изменении
+        /// </summary>
+        /// <returns>IDisposable-объект NotificationLocker, подавляющий нотификации в коллекции</returns>
+        public NotificationLocker Locker()
+        {
+            return new NotificationLocker(this);
+        }
     }
 }
