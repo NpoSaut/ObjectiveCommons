@@ -16,13 +16,13 @@ namespace ObjectiveCommons.Collections
         /// <summary>
         /// Подавляет уведомления об изменении коллекции
         /// </summary>
-        private bool NotificationsSupressed = false;
+        private int NotificationsSupressCounter = 0;
 
         private bool NotificationsAwaiting = false;
 
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            if (!NotificationsSupressed)
+            if (NotificationsSupressCounter <= 0)
                 base.OnCollectionChanged(e);
             else
                 NotificationsAwaiting = true;
@@ -51,17 +51,20 @@ namespace ObjectiveCommons.Collections
         /// </summary>
         protected void SupressNotifications()
         {
-            NotificationsSupressed = true;
+            NotificationsSupressCounter++;
         }
         /// <summary>
         /// Разрешает коллекции излучать нотификации
         /// </summary>
         protected void ReleaseNotifications()
         {
-            NotificationsSupressed = false;
-            
-            if (NotificationsAwaiting)
-                OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            NotificationsSupressCounter--;
+
+            if (NotificationsSupressCounter <= 0)
+            {
+                if (NotificationsAwaiting)
+                    OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            }
 
             NotificationsAwaiting = false;
         }
