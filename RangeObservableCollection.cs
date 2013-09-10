@@ -64,9 +64,8 @@ namespace ObjectiveCommons.Collections
             {
                 if (NotificationsAwaiting)
                     OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+                NotificationsAwaiting = false;
             }
-
-            NotificationsAwaiting = false;
         }
 
         /// <summary>
