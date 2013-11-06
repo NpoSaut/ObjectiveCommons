@@ -40,6 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleParameters\ConsoleArgumentShell.cs" />
+    <Compile Include="ConsoleParameters\ConsoleDefaultParameter.cs" />
+    <Compile Include="ConsoleParameters\ConsoleParameterNameAttribute.cs" />
+    <Compile Include="ConsoleParameters\ConsoleParametersBase.cs" />
     <Compile Include="Holder.cs" />
     <Compile Include="Interfaces\IContinuous.cs" />
     <Compile Include="LambdaComparer.cs" />
