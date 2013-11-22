@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="RepeaterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StateMachineTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ObjectiveCommons.csproj">

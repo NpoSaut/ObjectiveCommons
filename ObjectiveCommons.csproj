@@ -44,6 +44,8 @@
     <Compile Include="ConsoleParameters\ConsoleDefaultParameter.cs" />
     <Compile Include="ConsoleParameters\ConsoleParameterNameAttribute.cs" />
     <Compile Include="ConsoleParameters\ConsoleParametersBase.cs" />
+    <Compile Include="FiniteStateAutomation\StateMachine.cs" />
+    <Compile Include="FiniteStateAutomation\StateFactory.cs" />
     <Compile Include="Holder.cs" />
     <Compile Include="Interfaces\IContinuous.cs" />
     <Compile Include="LambdaComparer.cs" />
