@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -12,12 +13,20 @@ namespace Tools.ConsoleParameters
         public static String KeySymbol { get; set; }
         public static String SeparateSymbol { get; set; }
 
+        private List<PropertyInfo> _configuredProperties;
+        public ReadOnlyCollection<PropertyInfo> ConfiguredProperties { get; private set; }
+
         static ConsoleParametersBase()
         {
             KeySymbol = "/";
             SeparateSymbol = ":";
         }
 
+        public ConsoleParametersBase()
+        {
+            _configuredProperties = new List<PropertyInfo>();
+            ConfiguredProperties = new ReadOnlyCollection<PropertyInfo>(_configuredProperties);
+        }
 
         protected void FillUp(string[] args)
         {
@@ -76,8 +85,9 @@ namespace Tools.ConsoleParameters
 
         private void SetPropertyValue(PropertyInfo property, string value)
         {
-            object val = Convert.ChangeType((object) value, (Type) property.PropertyType);
+            object val = Convert.ChangeType(value, property.PropertyType);
             property.SetValue(this, val, new object[0]);
+            _configuredProperties.Add(property);
         }
     }
 }
