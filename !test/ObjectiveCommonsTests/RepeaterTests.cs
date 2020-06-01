@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using ObjectiveCommons;
 
 namespace ObjectiveCommonsTests
 {
-    [TestClass]
+    [TestFixture]
     public class RepeaterTests
     {
         private class CustomException : Exception { }
         private class CustomExceptionChild : CustomException { }
         private class CustomException2 : Exception { }
 
-        [TestMethod]
+        [Test]
         public void WithoutExceptions()
         {
             Repeater
@@ -45,21 +45,21 @@ namespace ObjectiveCommonsTests
             return res;
         }
 
-        [TestMethod]
+        [Test]
         public void CatchingCustomException()
         {
             var res = ThrowAndCatch<CustomException, CustomException>();
             Assert.AreEqual(res.ThrowCount, res.CatchCounter, "Отловили сообщений меньше, чем ожидали");
             Assert.AreEqual(res.ThrowCount + 1, res.RunCounter, "Должны были сработать без ошибки на {0} раз, а сработали на {1}", res.ThrowCount + 1, res.RunCounter);
         }
-        [TestMethod]
+        [Test]
         public void CatchingCustomExceptionChild()
         {
             var res = ThrowAndCatch<CustomExceptionChild, CustomException>();
             Assert.AreEqual(res.ThrowCount, res.CatchCounter, "Отловили сообщений меньше, чем ожидали");
             Assert.AreEqual(res.ThrowCount + 1, res.RunCounter, "Должны были сработать без ошибки на {0} раз, а сработали на {1}", res.ThrowCount + 1, res.RunCounter);
         }
-        [TestMethod]
+        [Test]
         public void ThrowForeignException()
         {
             try
